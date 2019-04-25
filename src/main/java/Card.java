@@ -1,16 +1,16 @@
 import java.util.Objects;
 
-public class User {
-    private String id;
-    private String name;
+public class Card {
+    String id;
+    String text;
 
-    public User() {
+    public Card() {
 
     }
 
-    public User(String id, String name) {
+    public Card(String id, String text) {
         this.id = id;
-        this.name = name;
+        this.text = text;
     }
 
     public String getId() {
@@ -21,20 +21,20 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getText() {
+        return text;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setText(String text) {
+        this.text = text;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User student = (User) o;
-        return Objects.equals(id, student.id);
+        Card card = (Card) o;
+        return Objects.equals(id, card.id);
     }
 
     @Override
@@ -44,9 +44,9 @@ public class User {
 
     @Override
     public String toString() {
-        return "Student{" +
+        return "Card{" +
                 "id='" + id + '\'' +
-                ", name='" + name + '\'' +
+                ", text='" + text + '\'' +
                 '}';
     }
 }

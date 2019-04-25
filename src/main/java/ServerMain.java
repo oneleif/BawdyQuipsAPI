@@ -19,6 +19,17 @@ public class ServerMain {
                 .enableCorsForAllOrigins()
                 .start(8080);
 
+        app.ws("/room/:room-id", ws -> {
+            ws.onConnect(session -> System.out.println("Connected"));
+            ws.onMessage((session, message) -> {
+                System.out.println("Received: " + message);
+                session.getRemote().sendString("Echo: " + message);
+            });
+            ws.onClose((session, statusCode, reason) -> System.out.println("Closed"));
+            ws.onError((session, throwable) -> System.out.println("Errored"));
+        });
+
         app.routes(() -> crud("/users/:user-id", new UserController()));
+        app.routes(() -> crud("/cards/:card-id", new CardController()));
     }
 }
