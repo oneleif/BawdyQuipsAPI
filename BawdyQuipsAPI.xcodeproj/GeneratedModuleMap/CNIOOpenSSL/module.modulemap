@@ -1,0 +1,4 @@
+module CNIOOpenSSL {
+    umbrella "/Users/otis_riege/Library/Mobile Documents/com~apple~CloudDocs/.Trash/BawdyQuipsAPI/BawdyQuipsAPI/.build/checkouts/swift-nio-ssl/Sources/CNIOOpenSSL/include"
+    export *
+}
