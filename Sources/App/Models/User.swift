@@ -9,16 +9,35 @@ import FluentSQLite
 import Vapor
 import Authentication
 
+struct GameScore: Codable {
+    var gold: Int
+    var silver: Int
+    var bronze: Int
+    
+    static var zero: GameScore {
+        return GameScore(gold: 0, silver: 0, bronze: 0)
+    }
+}
 
 final class User: SQLiteModel {
     var id: Int?
+    // Auth
     var username: String
     var password: String
+    // Game Data
+    var currentScore: GameScore
+    var totalScore: GameScore
     
-    init(id: Int? = nil, username: String, password: String) {
+    init(id: Int? = nil,
+         username: String,
+         password: String,
+         currentScore: GameScore = GameScore.zero,
+         totalScore: GameScore = GameScore.zero) {
         self.id = id
         self.username = username
         self.password = password
+        self.currentScore = currentScore
+        self.totalScore = totalScore
     }
 }
 
