@@ -1,0 +1,4 @@
+module CNIOOpenSSL {
+    umbrella "/Users/leif/Documents/_dev/oneleif/BawdyQuipsAPI/.build/checkouts/swift-nio-ssl/Sources/CNIOOpenSSL/include"
+    export *
+}
