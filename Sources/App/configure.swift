@@ -38,4 +38,9 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     migrations.add(model: User.self, database: .sqlite)
     migrations.add(model: Card.self, database: .sqlite)
     services.register(migrations)
+    
+    //register WebSocket service
+    let websockets = NIOWebSocketServer.default()
+    sockets(websockets)
+    services.register(websockets, as: WebSocketServer.self)
 }
