@@ -2,6 +2,7 @@ import Vapor
 
 struct RoomSession: Content, Hashable {
   let id: String
+    //TODO add card deck
 }
 
 extension RoomSession: Parameter {

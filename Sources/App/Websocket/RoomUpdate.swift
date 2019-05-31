@@ -5,7 +5,9 @@ struct RoomUpdate: Content {
         case VoteForCard
         case SelectCard
         case VoteForAnswer
-        case SceneChange
+        case GoToGame
+        case GoToVoting
+        case GoToScoring
     }
     
     let updateType: UpdateType
