@@ -2,7 +2,7 @@ import Vapor
 
 /// Register your application's routes here.
 public func routes(_ router: Router) throws {
-    let sessionManager = TrackingSessionManager.tracking
+    let sessionManager = RoomSessionManager.rooms
     
     let usersController = UserController()
     try router.register(collection: usersController)
@@ -15,18 +15,22 @@ public func routes(_ router: Router) throws {
     }
     
     // MARK: Poster Routes
-    router.post("create", use: sessionManager.createTrackingSession)
+    router.post("create", use: sessionManager.createRoomSession)
     
-    router.post("close", TrackingSession.parameter) { req -> HTTPStatus in
-        let session = try req.parameters.next(TrackingSession.self)
+    router.post("close", RoomSession.parameter) { req -> HTTPStatus in
+        let session = try req.parameters.next(RoomSession.self)
         sessionManager.close(session)
         return .ok
     }
     
-    router.post("update", TrackingSession.parameter) { req -> Future<HTTPStatus> in
-        let session = try req.parameters.next(TrackingSession.self)
-        return try Location.decode(from: req).map(to: HTTPStatus.self) { location in
-            sessionManager.update(for: session)
+    router.post("update", RoomSession.parameter) { req -> Future<HTTPStatus> in
+        //get session ID from the URL
+        let session = try req.parameters.next(RoomSession.self)
+        //create a room update from the POST request body
+        return try RoomUpdate.decode(from: req).map(to: HTTPStatus.self) { roomUpdate in
+            //broadcast the room update
+            sessionManager.update(roomUpdate, for: session)
+            
             return .ok
         }
     }
