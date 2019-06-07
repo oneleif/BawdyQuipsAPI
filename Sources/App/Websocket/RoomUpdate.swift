@@ -1,6 +1,6 @@
 import Vapor
 
-struct RoomUpdate: Content {
+struct RoomUpdate: Content, Codable {
     enum UpdateType: Int, Codable {
         case GoToGame
         case SelectCard

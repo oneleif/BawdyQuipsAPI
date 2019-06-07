@@ -7,8 +7,6 @@
 
 import Vapor
 
-
-
 struct GameUpdate: Content {
     enum Scenes: String, Codable{
         case Playing
