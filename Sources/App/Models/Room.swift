@@ -9,7 +9,7 @@ import FluentSQLite
 import Vapor
 import Authentication
 
-final class Room: SQLiteModel {
+final class Room: SQLiteModel, Codable {
     var id: Int?
     var users: [User.ID]
     var judge: User.ID?

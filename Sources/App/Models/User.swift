@@ -19,7 +19,7 @@ struct GameScore: Codable {
     }
 }
 
-final class User: SQLiteModel {
+final class User: SQLiteModel, Codable {
     var id: Int?
     // Auth
     var username: String

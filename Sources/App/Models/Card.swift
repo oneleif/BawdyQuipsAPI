@@ -9,7 +9,7 @@ import FluentSQLite
 import Vapor
 import Authentication
 
-final class Card: SQLiteModel {
+final class Card: SQLiteModel, Codable {
     var id: Int?
     var description: String
     var numberOfBlanks: Int
