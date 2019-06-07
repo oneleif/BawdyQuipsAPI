@@ -1,8 +1,8 @@
 import Vapor
 
 struct RoomSession: Content, Hashable {
-  let id: String
-    //TODO add card deck
+    let id: String
+    //TODO: add some way to reference a room
 }
 
 extension RoomSession: Parameter {

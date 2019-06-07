@@ -29,10 +29,10 @@ public func routes(_ router: Router) throws {
         //create a room update from the POST request body
         return try RoomUpdate.decode(from: req).map(to: HTTPStatus.self) { roomUpdate in
             //broadcast the room update
-            sessionManager.update(roomUpdate, for: session)
-            //TODO check which type of update is sent, and send the appropriate response
-            //i.e., if GoToGame, send a hand of cards and the prompt to each player
+            //TODO: check which user is sending update, filter admin commands
+            sessionManager.update(roomUpdate.getUpdate(), for: session)
             return .ok
         }
     }
 }
+
