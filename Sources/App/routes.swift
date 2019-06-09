@@ -27,11 +27,13 @@ public func routes(_ router: Router) throws {
         //get session ID from the URL
         let session = try req.parameters.next(RoomSession.self)
         //create a room update from the POST request body
-        return try RoomUpdate.decode(from: req).map(to: HTTPStatus.self) { roomUpdate in
+        return try RoomUpdate.decode(from: req).flatMap(to: HTTPStatus.self) { roomUpdate in
             //broadcast the room update
             //TODO: check which user is sending update, filter admin commands
-            sessionManager.update(roomUpdate.getUpdate(), for: session)
-            return .ok
+            return roomUpdate.getUpdate(req).map(to: HTTPStatus.self) { (update) -> HTTPStatus in
+                sessionManager.update(update, for: session)
+                return .ok
+            }
         }
     }
 }

@@ -19,13 +19,15 @@ struct GameUpdate: Content {
     var room: Room.ID?
     
     //Playing Scene
+    var hands: [User.ID: [Card]]?
     var playerSelectedCards: [Card]?
     var cardsToVoteOn: [User: [Card]]?
     
     //Voting Scene
-    var goldAward: Bool
-    var silverAward: Bool
-    var bronzeAward: Bool
+    var goldAward: Bool?
+    var silverAward: Bool?
+    var bronzeAward: Bool?
+    
     //Scoreboard Scene
 }
 
