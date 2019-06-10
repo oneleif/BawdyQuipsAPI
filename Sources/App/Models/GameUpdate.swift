@@ -24,9 +24,9 @@ struct GameUpdate: Content {
     var cardsToVoteOn: [User: [Card]]?
     
     //Voting Scene
-    var goldAward: Bool?
-    var silverAward: Bool?
-    var bronzeAward: Bool?
+    var goldAward: User.ID?
+    var silverAward: User.ID?
+    var bronzeAward: User.ID?
     
     //Scoreboard Scene
 }
