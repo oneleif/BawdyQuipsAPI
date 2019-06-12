@@ -29,7 +29,7 @@ public func routes(_ router: Router) throws {
         //create a room update from the POST request body
         return try RoomUpdate.decode(from: req).flatMap(to: HTTPStatus.self) { roomUpdate in
             //broadcast the room update
-            return roomUpdate.getUpdate(req).map(to: HTTPStatus.self) { (update) -> HTTPStatus in
+            return try roomUpdate.getUpdate(req).map(to: HTTPStatus.self) { (update) -> HTTPStatus in
                 sessionManager.update(update, for: session)
                 return .ok
             }

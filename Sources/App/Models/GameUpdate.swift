@@ -7,21 +7,38 @@
 
 import Vapor
 
-struct GameUpdate: Content {
-    enum Scenes: String, Codable{
+struct GameUpdate: Content, CustomStringConvertible {
+    var description: String {
+        return "\(user ?? 0)"
+    }
+    
+    enum Scenes: String, Codable, Hashable {
+        case Lobby
         case Playing
         case Voting
         case Scoreboard
     }
+    
+    enum UpdateType: Int, Codable {
+        case CreateLobby
+        case GoToGame
+        case SelectCard
+        case GoToVoting
+        case VoteForAnswer
+        case GoToScoring
+    }
+    
+    var updateType: UpdateType?
+    
     // The user sending the update
     var user: User.ID?
     var scene: Scenes?
     var room: Room.ID?
     
     //Playing Scene
-    var hands: [User.ID: [Card]]?
-    var playerSelectedCards: [Card]?
-    var cardsToVoteOn: [User: [Card]]?
+    var hands: [User.ID: [Card.ID]]?
+    var playerSelectedCards: [Card.ID]?
+    var cardsToVoteOn: [User.ID: [Card.ID]]?
     
     //Voting Scene
     var goldAward: User.ID?
@@ -29,5 +46,9 @@ struct GameUpdate: Content {
     var bronzeAward: User.ID?
     
     //Scoreboard Scene
+}
+
+extension GameUpdate: Equatable, Hashable {
+    
 }
 

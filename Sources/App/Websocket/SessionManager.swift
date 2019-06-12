@@ -40,7 +40,7 @@ final class RoomSessionManager {
         return wordKey(with: request)
             .flatMap(to: RoomSession.self) { [unowned self] key -> Future<RoomSession> in
                 //Create RoomSession for this session with ID
-                let session = RoomSession(id: key)
+                let session = RoomSession(id: key, something: GameUpdate())
                 //Ensure the ID is unique, if not generate a new one
                 guard self.sessions[session] == nil else {
                     return self.createRoomSession(for: request)
@@ -48,12 +48,14 @@ final class RoomSessionManager {
                 
                 //Record the new RoomSession and give it no observers
                 self.sessions[session] = []
+                
+                
                 return Future.map(on: request) { session }
         }
     }
 
     //when a Poster sends an update, send to each registered observer
-    func update<T: Codable>(_ object: T, for session: RoomSession) {
+    func update(_ object: GameUpdate, for session: RoomSession) {
         guard let listeners = sessions[session] else { return }
         listeners.forEach { ws in ws.send(object) }
     }

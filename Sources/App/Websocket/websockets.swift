@@ -16,12 +16,22 @@ public func sockets(_ websockets: NIOWebSocketServer) {
         //add WebSocket to the session as an Observer
         sessionManager.add(listener: ws, to: session)
     }
+    
+    websockets.get("create") { ws, req in
+        print("create session")
+        
+        ws.onText { ws, text in
+            print("ws: \(text)" )
+            ws.send("echo \(text)")
+        }
+    }
+    
+    
 }
-
 extension WebSocket {
-    func send<T: Codable>(_ object: T) {
+    func send(_ object: GameUpdate) {
         let encoder = JSONEncoder()
         guard let data = try? encoder.encode(object) else { return }
-        send(data)
+        send(String(data: data, encoding: .utf8)!)
     }
 }
