@@ -40,7 +40,7 @@ final class RoomSessionManager {
         return wordKey(with: request)
             .flatMap(to: RoomSession.self) { [unowned self] key -> Future<RoomSession> in
                 //Create RoomSession for this session with ID
-                let session = RoomSession(id: key, something: GameUpdate())
+                let session = RoomSession(id: key, update: GameUpdate())
                 //Ensure the ID is unique, if not generate a new one
                 guard self.sessions[session] == nil else {
                     return self.createRoomSession(for: request)
