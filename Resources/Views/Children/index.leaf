@@ -1,81 +1,68 @@
+<script>
+    var sessionId = ""
+    var port = "8080"
+    function createRoom() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                sessionId = JSON.parse(this.responseText).id;
+               
+                console.log("new room session id: " + this.responseText);
+            }
+        };
+        
+        xhttp.open("POST", "http://localhost:" + port + "/create", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send();
+    }
+
+function joinRoom() {
+    var socket = new WebSocket("ws://localhost:" + port + "/join/" + sessionId);
+    socket.onmessage = function (event) {
+        console.log("event: " + event.data + "\n");
+    };
+}
+
+function updateRoom() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log("roomUpdate: " + this.responseText);
+			document.write(this.responseText)
+        }
+    };
+    
+    var obj = Object();
+    obj.update = Object();
+    obj.update.user = 0;
+    obj.update.updateType = 0;
+    
+    xhttp.open("POST", "http://localhost:" + port + "/update/" + sessionId, true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send(JSON.stringify(obj));
+}
+</script>
+
+
 #set("content") {
 
-<h1>#(title)</h1>
+<h1>Bawdy Quips</h1>
 
-<h3>Your Solutions</h3>
+<h3>Get in a game</h3>
 
 
-#for(event in userSolutions) {
 
-#set("eventCard") {
-
-<div class="eventBackground">
-	<form method="post" action="/updateSolution">
-		<div class="eventCard">
-			<div class="form-group">
-				<label for="title">Solution Title</label>
-				
-				<input type="text" name="title" class="form-control"
-                id="title" value="#(event.title)" #if(user.id != event.user) {disabled}else{required}>
-			</div>
-			
-			<div class="form-group">
-				<label for="level">Author</label>
-				
-				<input type="text" class="form-control" value="#(event.authorName)" disabled>
-			</div>
-			#// Description
-			
-			<div class="form-group">
-				<label for="json">Solution JSON</label>
-				
-				<textarea rows="3" type="text" name="json" class="form-control"
-                id="json" #if(user.id != event.user) {disabled}else{required}>#(event.json)</textarea>
-			</div>
-
-            <div class="form-group">
-                <label for="json">Solution Code</label>
-
-                <textarea rows="7" type="code" name="code" class="form-control"
-                id="code" #if(user.id != event.user) {disabled}else{required}>#(event.code)</textarea>
-            </div>
-
-		
-		   
-		    #// IDs
-			
-			<div class="form-group" hidden>
-				<input type="number" name="user" class="form-control"
-		        id="user" value="#(user.id)" step="1">
-				
-				<input type="number" name="id" class="form-control"
-		        id="id" value="#(event.id)" step="1">
-				
-				<input type="text" name="authorName" class="form-control"
-				id="authorName" value="#(event.authorName)" step="1">
-				
-				<input type="text" name="isSelectedEvent" value="#(event.isSelectedEvent)">
-			</div>
-			
-			<div class="updateButtons">#if(user.id == event.user) {
-				<button type="submit" class="btn btn-success">Update Solution</button>
-				
-				<button type="submit" class="btn btn-danger" formaction="/deleteEvent" formmethod="post">Delete Solution</button>
-				
-				}
-				<a class="btn btn-warning" href="/solution/#(event.id)">
-				    View Solution
-				</a></div>
-		</div>
-	</form>
+<div>
+    <button type="button" onclick="createRoom()">Create Room</button>
 </div>
 
+<div>
+    <button type="button" onclick="joinRoom()">Join Room</button>
+</div>
+
+<div>
+    <button type="button" onclick="updateRoom()">Update Room</button>
+</div>
 }
 
-#get(eventCard)
-
-}
-
-}
-
-#embed("authBase")
+#embed("base")

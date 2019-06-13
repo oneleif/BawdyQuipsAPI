@@ -1,4 +1,5 @@
 import Vapor
+import Leaf
 
 /// Register your application's routes here.
 public func routes(_ router: Router) throws {
@@ -23,17 +24,31 @@ public func routes(_ router: Router) throws {
         return .ok
     }
     
-    router.post("update", RoomSession.parameter) { req -> Future<HTTPStatus> in
+//    router.post("update", RoomSession.parameter) { req -> Future<View> in
+//        //get session ID from the URL
+//        let session = try req.parameters.next(RoomSession.self)
+//        //create a room update from the POST request body
+//        return try RoomUpdate.decode(from: req).flatMap(to: View.self) { roomUpdate in
+//            //broadcast the room update
+//            return try roomUpdate.getUpdate(req).flatMap(to: View.self) { update in
+//                sessionManager.update(update, for: session)
+//                return try req.view().render("Children/game")
+//            }
+//        }
+//    }
+    
+    router.post("update", RoomSession.parameter) { req -> Future<View> in
         //get session ID from the URL
         let session = try req.parameters.next(RoomSession.self)
         //create a room update from the POST request body
-        return try RoomUpdate.decode(from: req).flatMap(to: HTTPStatus.self) { roomUpdate in
+        return try RoomUpdate.decode(from: req).flatMap(to: View.self) { roomUpdate in
+            
             //broadcast the room update
-            return try roomUpdate.getUpdate(req).map(to: HTTPStatus.self) { (update) -> HTTPStatus in
+            return try roomUpdate.getUpdate(req).flatMap(to: View.self) { update in
+                let object = GameUpdate(updateType: .GoToGame, user: 1000, scene: .Playing, room: 0, hands: [:], playerSelectedCards: Array(0 ... 8), cardsToVoteOn: [:])
                 sessionManager.update(update, for: session)
-                return .ok
+                return try req.view().render("Children/game", object)
             }
         }
     }
 }
-
