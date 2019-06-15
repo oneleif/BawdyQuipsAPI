@@ -1,13 +1,16 @@
 <script>
-    var sessionId = ""
-    var port = "8080"
+    var roomUpdate = "";
+    var port = "8080";
+    
     function createRoom() {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                sessionId = JSON.parse(this.responseText).id;
+                var response = JSON.parse(this.responseText);
+                
+                roomUpdate = response;
                
-                console.log("new room session id: " + this.responseText);
+                console.log("new room session: " + this.responseText);
             }
         };
         
@@ -17,40 +20,40 @@
     }
 
 function joinRoom() {
-    var socket = new WebSocket("ws://localhost:" + port + "/join/" + sessionId);
+    var joinSessionId = document.getElementById('joinRoomCode').value
+    var socket = new WebSocket("ws://localhost:" + port + "/join/" + joinSessionId);
     socket.onmessage = function (event) {
         console.log("event: " + event.data + "\n");
     };
+    
+    //TODO: needs to have an initialized roomUpdate
+    updateRoom();
 }
 
 function updateRoom() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
+            var response = JSON.parse(this.responseText);
+            
+            sessionId = response.sessionId;
+            update = response.update;
+            
+			document.write(this.responseText);
+            
             console.log("roomUpdate: " + this.responseText);
-			document.write(this.responseText)
         }
     };
     
-    var obj = Object();
-    obj.update = Object();
-    obj.update.user = 0;
-    obj.update.updateType = 0;
-    
     xhttp.open("POST", "http://localhost:" + port + "/update/" + sessionId, true);
     xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send(JSON.stringify(obj));
+    xhttp.send(JSON.stringify(roomUpdate));
 }
 </script>
 
 
 #set("content") {
-
-<h1>Bawdy Quips</h1>
-
 <h3>Get in a game</h3>
-
-
 
 <div>
     <button type="button" onclick="createRoom()">Create Room</button>
@@ -58,6 +61,7 @@ function updateRoom() {
 
 <div>
     <button type="button" onclick="joinRoom()">Join Room</button>
+    <input id="joinRoomCode">
 </div>
 
 <div>

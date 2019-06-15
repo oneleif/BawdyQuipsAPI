@@ -24,19 +24,6 @@ public func routes(_ router: Router) throws {
         return .ok
     }
     
-//    router.post("update", RoomSession.parameter) { req -> Future<View> in
-//        //get session ID from the URL
-//        let session = try req.parameters.next(RoomSession.self)
-//        //create a room update from the POST request body
-//        return try RoomUpdate.decode(from: req).flatMap(to: View.self) { roomUpdate in
-//            //broadcast the room update
-//            return try roomUpdate.getUpdate(req).flatMap(to: View.self) { update in
-//                sessionManager.update(update, for: session)
-//                return try req.view().render("Children/game")
-//            }
-//        }
-//    }
-    
     router.post("update", RoomSession.parameter) { req -> Future<View> in
         //get session ID from the URL
         let session = try req.parameters.next(RoomSession.self)
@@ -45,10 +32,15 @@ public func routes(_ router: Router) throws {
             
             //broadcast the room update
             return try roomUpdate.getUpdate(req).flatMap(to: View.self) { update in
-                let object = GameUpdate(updateType: .GoToGame, user: 1000, scene: .Playing, room: 0, hands: [:], playerSelectedCards: Array(0 ... 8), cardsToVoteOn: [:])
+                let context = GameContext(sessionID: session.id, update: session.update)
                 sessionManager.update(update, for: session)
-                return try req.view().render("Children/game", object)
+                return try req.view().render("Children/game", context)
             }
         }
     }
+}
+
+struct GameContext: Encodable{
+    let sessionID: String
+    let update: GameUpdate
 }
