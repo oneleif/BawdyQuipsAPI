@@ -9,9 +9,16 @@ import FluentSQLite
 import Vapor
 import Authentication
 
-final class Card: SQLiteModel, Codable, Equatable {
+final class Card: SQLiteModel, Codable, Hashable {
     static func == (lhs: Card, rhs: Card) -> Bool {
         return lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(description)
+        hasher.combine(numberOfBlanks)
+        hasher.combine(isPrompt)
     }
     
     var id: Int?

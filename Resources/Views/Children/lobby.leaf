@@ -1,0 +1,21 @@
+#set("content") {
+<h3>Select a card</h3>
+
+<div>
+	<div>
+		<p>#(roomCode)</p>
+	</div>
+    #for(player in players){
+    <div styles="height:60px;">
+            <p>#(player)</p>
+			<p>#(player.isReady)</p>
+        </div>
+    }
+</div>
+
+<div>
+	<button type="button" onClick="Ready()">Ready up</button>
+</div>
+}
+
+#embed("base")

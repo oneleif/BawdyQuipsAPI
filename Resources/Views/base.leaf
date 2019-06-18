@@ -9,6 +9,8 @@
 	
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	
+	<script src = "game.js" type = "text/javascript" ></script>
+	
 	<title>Bawdy Quips</title>
 </head>
 <body>

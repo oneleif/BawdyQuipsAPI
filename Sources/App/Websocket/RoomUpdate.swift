@@ -112,31 +112,31 @@ struct RoomUpdate: Content, Codable {
         return Future.map(on: req) { return newUpdate }
     }
     
-    func voteForAnswer(_ req: Request) -> Future<GameUpdate> {
-        // Check that the update.user is coming from the update.room.judge
-        guard let roomID = update.room
-         else{
-            return Future.map(on: req) { return self.update }
-        }
-        
-        return Room.find(roomID, on: req).flatMap { (room) -> (Future<GameUpdate>) in
-            guard let room = room,
-                let gold = self.update.goldAward,
-                let silver = self.update.silverAward,
-                let bronze = self.update.bronzeAward,
-                self.update.user == room.judge else {
-                    return Future.map(on: req) { return self.update }
-            }
-            
-            
-            return flatMap(self.updateUser(req, .Gold, gold),
-                           self.updateUser(req, .Silver, silver),
-                           self.updateUser(req, .Bronze, bronze)) { (gold, silver, bronze) -> Future<GameUpdate> in
-                            //update()
-                Future.map(on: req) { return self.update }
-            }
-        }
-    }
+//    func voteForAnswer(_ req: Request) -> Future<GameUpdate> {
+//        // Check that the update.user is coming from the update.room.judge
+//        guard let roomID = update.room
+//         else{
+//            return Future.map(on: req) { return self.update }
+//        }
+//        
+//        return Room.find(roomID, on: req).flatMap { (room) -> (Future<GameUpdate>) in
+//            guard let room = room,
+//                let gold = self.update.goldAward,
+//                let silver = self.update.silverAward,
+//                let bronze = self.update.bronzeAward,
+//                self.update.user == room.judge else {
+//                    return Future.map(on: req) { return self.update }
+//            }
+//            
+//            
+//            return flatMap(self.updateUser(req, .Gold, gold),
+//                           self.updateUser(req, .Silver, silver),
+//                           self.updateUser(req, .Bronze, bronze)) { (gold, silver, bronze) -> Future<GameUpdate> in
+//                            //update()
+//                Future.map(on: req) { return self.update }
+//            }
+//        }
+//    }
     
     func updateUser(_ req: Request, _ award: AwardType, _ user: User.ID) -> Future<User.ID?> {
         // update the score of the gold awarded user

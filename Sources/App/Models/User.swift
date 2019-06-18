@@ -24,8 +24,9 @@ final class User: SQLiteModel, Codable, Hashable {
         return lhs.id == rhs.id
     }
     
-    var hashValue: Int {
-        return id ?? 0
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
     
     var id: Int?

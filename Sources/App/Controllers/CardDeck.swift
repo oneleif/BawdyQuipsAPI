@@ -7,7 +7,17 @@
 
 import Foundation
 
-class CardDeck: Codable {
+class CardDeck: Codable, Hashable {
+    static func == (lhs: CardDeck, rhs: CardDeck) -> Bool {
+        lhs.answerCards == rhs.answerCards &&
+        lhs.promptCards == rhs.promptCards
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(answerCards)
+        hasher.combine(promptCards)
+    }
+    
     var answerCards: [Card] = []
     var promptCards: [Card] = []
     

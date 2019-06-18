@@ -1,29 +1,4 @@
-
-<script>
-function updateRoom() {
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-			document.getElementById("updates").innerHTML += this.responseText + "\n";
-		}
-	};
-	
-	var obj = Object();
-	obj.update = Object();
-	obj.update.user = 0;
-	obj.update.updateType = 0;
-	var text = document.getElementById("joinRoomCode").value;
-	xhttp.open("POST", "http://localhost:8080/update/" + text, true);
-	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(JSON.stringify(obj));
-}
-</script>
-
-
 #set("content") {
-
-<!--<h1>#(title)</h1>-->
-
 <h3>Select a card</h3>
 
 <div>

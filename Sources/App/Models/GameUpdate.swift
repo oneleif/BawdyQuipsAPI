@@ -12,7 +12,7 @@ struct GameUpdate: Content, CustomStringConvertible {
         return "\(user ?? 0)"
     }
     
-    enum Scenes: String, Codable, Hashable {
+    enum Scenes: Int, Codable, Hashable {
         case Lobby
         case Playing
         case Voting
@@ -21,6 +21,7 @@ struct GameUpdate: Content, CustomStringConvertible {
     
     enum UpdateType: Int, Codable {
         case CreateLobby
+        case PlayerJoined
         case GoToGame
         case SelectCard
         case GoToVoting
@@ -33,7 +34,9 @@ struct GameUpdate: Content, CustomStringConvertible {
     // The user sending the update
     var user: User.ID?
     var scene: Scenes?
-    var room: Room.ID?
+    
+    //Lobby scene
+    var isReady: Bool?
     
     //Playing Scene
     var hands: [User.ID: [Card.ID]]?
