@@ -11,7 +11,7 @@ import Authentication
 
 final class Room: Codable, Hashable {
     static func == (lhs: Room, rhs: Room) -> Bool {
-        lhs.id == rhs.id
+        return lhs.id == rhs.id
     }
     
     func hash(into hasher: inout Hasher) {

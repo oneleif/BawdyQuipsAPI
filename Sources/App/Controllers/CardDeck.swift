@@ -9,7 +9,7 @@ import Foundation
 
 class CardDeck: Codable, Hashable {
     static func == (lhs: CardDeck, rhs: CardDeck) -> Bool {
-        lhs.answerCards == rhs.answerCards &&
+        return lhs.answerCards == rhs.answerCards &&
         lhs.promptCards == rhs.promptCards
     }
     

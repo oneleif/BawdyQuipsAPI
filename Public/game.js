@@ -1,8 +1,10 @@
-var roomUpdate = Object();
-roomUpdate.update = Object();
-roomUpdate.update.user = 0; //temp UserID
-roomUpdate.update.scene = 0; //lobby
-roomUpdate.update.updateType = 0; //player joined
+var roomSession = Object();
+roomSession.id = "";
+roomSession.update = Object();
+roomSession.update.user = 0; //temp UserID
+roomSession.update.scene = 0; //lobby
+roomSession.update.updateType = 0; //player joined
+roomSession.room = Object();
 var port = "8080";
 
 function createRoom() {
@@ -10,9 +12,9 @@ function createRoom() {
 	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			var response = JSON.parse(this.responseText);
-			roomUpdate = response;
+			roomSession = response;
 			console.log("new room session: " + this.responseText);
-			document.getElementById("joinRoomCode").value = roomUpdate.id;
+			document.getElementById("joinRoomCode").value = roomSession.id;
 			joinRoom();
 		}
 	};
@@ -39,19 +41,19 @@ function updateRoom() {
 		}
 	};
 	
-	xhttp.open("POST", "http://localhost:" + port + "/update/" + roomUpdate.id, true);
+	xhttp.open("POST", "http://localhost:" + port + "/update/" + roomSession.id, true);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(JSON.stringify(roomUpdate));
+	xhttp.send(JSON.stringify(roomSession));
 }
 
 function unready() {
-	roomUpdate.update.updateType = 1;
-	roomUpdate.update.isReady = false;
+	roomSession.update.updateType = 1;
+	roomSession.update.isReady = false;
 	updateRoom();
 }
 
 function ready() {
-	roomUpdate.update.updateType = 1;
-	roomUpdate.update.isReady = true;
+	roomSession.update.updateType = 1;
+	roomSession.update.isReady = true;
 	updateRoom();
 }
