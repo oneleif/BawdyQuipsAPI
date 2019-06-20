@@ -6,6 +6,8 @@ import Leaf
 /// Called before your application initializes.
 public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
     // Register providers first
+//    let serverConfiure = NIOServerConfig.default(hostname: "127.0.0.1", port: 9090)
+//    services.register(serverConfiure)
     try services.register(FluentSQLiteProvider())
     try services.register(LeafProvider())
     try services.register(AuthenticationProvider())
@@ -17,6 +19,13 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     
     // Register middleware
     var middlewares = MiddlewareConfig() // Create _empty_ middleware config
+    let corsConfiguration = CORSMiddleware.Configuration(
+        allowedOrigin: .all,
+        allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
+        allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin]
+    )
+    let corsMiddleware = CORSMiddleware(configuration: corsConfiguration)
+    middlewares.use(corsMiddleware)
     middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
     middlewares.use(SessionsMiddleware.self)
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response

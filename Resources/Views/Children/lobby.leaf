@@ -1,0 +1,21 @@
+#set("content") {
+<h3>Lobby</h3>
+
+<div>
+	<div>
+        <p>Room code: #(sessionID)</p>
+	</div>
+    #for(player in room.users){
+    <div styles="height:60px;">
+            <p>#(player)</p>
+			<p>#(player.isReady)</p>
+        </div>
+    }
+</div>
+
+<div>
+	<button type="button" onClick="Ready()">Ready up</button>
+</div>
+}
+
+#embed("base")

@@ -1,31 +1,3 @@
-/// Copyright (c) 2019 Razeware LLC
-///
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
-/// distribute, sublicense, create a derivative work, and/or sell copies of the
-/// Software in any work that is designed, intended, or marketed for pedagogical or
-/// instructional purposes related to programming, coding, application development,
-/// or information technology.  Permission for such use, copying, modification,
-/// merger, publication, distribution, sublicensing, creation of derivative works,
-/// or sale is expressly withheld.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-
 import Vapor
 import WebSocket
 
@@ -33,56 +5,68 @@ import WebSocket
 // in production scenarios, this will not be scalable beyond a single server
 // make sure to configure appropriately with a database like Redis to properly
 // scale
-final class TrackingSessionManager {
-    private(set) var sessions: LockedDictionary<TrackingSession, [WebSocket]> = [:]
+
+typealias Connections = (room: RoomSession, sessions: [WebSocket])
+
+final class RoomSessionManager {
+    private(set) var connections: LockedDictionary<String, Connections> = [:]
     
-    public static var tracking: TrackingSessionManager = {
-        return TrackingSessionManager()
+    public static var rooms: RoomSessionManager = {
+        return RoomSessionManager()
     }()
     
     // MARK: Observer Interactions
-    func add(listener: WebSocket, to session: TrackingSession) {
-        guard var listeners = sessions[session] else { return }
-        listeners.append(listener)
-        sessions[session] = listeners
+    func add(listener: WebSocket, to session: String) {
+        //verify session exists
+        guard var listeners = connections[session]?.1 else { return }
         
+        //add observer's websocket to our listeners
+        listeners.append(listener)
+        connections[session]?.sessions = listeners
+        
+        //remove client room listeners on close
         listener.onClose.always { [weak self, weak listener] in
             guard let listener = listener else { return }
             self?.remove(listener: listener, from: session)
         }
     }
     
-    func remove(listener: WebSocket, from session: TrackingSession) {
-        guard var listeners = sessions[session] else { return }
+    func remove(listener: WebSocket, from session: String) {
+        guard var listeners = connections[session]?.sessions else { return }
         listeners = listeners.filter { $0 !== listener }
-        sessions[session] = listeners
+        connections[session]?.sessions = listeners
     }
 
     // MARK: Poster Interactions
-    func createTrackingSession(for request: Request) -> Future<TrackingSession> {
+    func createRoomSession(for request: Request) -> Future<String> {
+        //Create session ID
         return wordKey(with: request)
-            .flatMap(to: TrackingSession.self) { [unowned self] key -> Future<TrackingSession> in
-                let session = TrackingSession(id: key)
-                guard self.sessions[session] == nil else {
-                    return self.createTrackingSession(for: request)
-
+            .flatMap(to: String.self) { [unowned self] key -> Future<String> in                //Ensure the ID is unique, if not generate a new one
+                guard self.connections[key] == nil else {
+                    return self.createRoomSession(for: request)
                 }
-                self.sessions[session] = []
-                return Future.map(on: request) { session }
+                let connection: Connections = (room: RoomSession(), sessions: [WebSocket]())
+                //Record the new RoomSession and give it no observers
+                self.connections[key] = connection
+                
+                
+                return Future.map(on: request) { key }
         }
     }
 
-    func update(for session: TrackingSession) {
-        guard let listeners = sessions[session] else { return }
-        listeners.forEach { ws in ws.send("update string") }
+    //when a Poster sends an update, send to each registered observer
+    func update(_ object: RoomSession, for session: String) {
+        guard let listeners = connections[session]?.sessions else { return }
+        listeners.forEach { ws in ws.send(object) }
     }
 
-    func close(_ session: TrackingSession) {
-        guard let listeners = sessions[session] else { return }
+    //close the Observer's webSocket
+    func close(_ session: String) {
+        guard let listeners = connections[session]?.sessions else { return }
         listeners.forEach { ws in
             ws.close()
         }
-        sessions[session] = nil
+        connections[session] = nil
     }
 }
 

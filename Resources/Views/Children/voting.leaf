@@ -1,0 +1,9 @@
+#set("content") {
+<h3>Voting</h3>
+
+<div>
+	
+</div>
+}
+
+#embed("base")

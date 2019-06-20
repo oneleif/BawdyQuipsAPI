@@ -19,14 +19,27 @@ struct GameScore: Codable {
     }
 }
 
-final class User: SQLiteModel {
+final class User: SQLiteModel, Codable, Hashable {
+    static func == (lhs: User, rhs: User) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
     var id: Int?
+    
     // Auth
     var username: String
     var password: String
+    
     // Game Data
     var currentScore: GameScore
     var totalScore: GameScore
+    
+    var handOfCards: [Card]?
     
     init(id: Int? = nil,
          username: String,

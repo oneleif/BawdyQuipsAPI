@@ -1,0 +1,18 @@
+#set("content") {
+<h3>Select a card</h3>
+
+<div>
+	<div>
+        <p>#(user)</p>
+    </div>
+    
+    #for(card in playerSelectedCards){
+    <div styles="height:60px;">
+            <button type="button" onclick="selectCard()" class="btn btn-primary">#(card)</button>
+        </div>
+    }
+    
+</div>
+}
+
+#embed("base")

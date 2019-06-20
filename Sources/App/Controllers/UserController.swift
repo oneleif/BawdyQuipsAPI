@@ -22,7 +22,7 @@ class UserController: RouteCollection {
         
         let protectedRouter = authSessionRouter.grouped(RedirectMiddleware<User>(path: "/login"))
         
-        protectedRouter.get(use: indexHandler)
+        router.get(use: indexHandler)
         
         protectedRouter.get("cards", use: getCards)
         protectedRouter.post("cards", use: addCard)
@@ -35,9 +35,9 @@ class UserController: RouteCollection {
     // MARK: View Handlers
     
     func indexHandler(_ req: Request) throws -> Future<View> {
-        let user = try req.requireAuthenticated(User.self)
-        let context = LeafContext(title: "Home", user: user)
-        return try req.view().render("Children/index", context)
+//        let user = try req.requireAuthenticated(User.self)
+//        let context = LeafContext(title: "Home", user: user)
+        return try req.view().render("Children/index")
     }
     
     func loginHandler(_ req: Request) throws -> Future<View> {
@@ -84,24 +84,6 @@ class UserController: RouteCollection {
                     try req.authenticateSession(user)
                     return .accepted
             }
-        }
-    }
-    
-    func profile(_ req: Request) throws -> Future<User> {
-        let user = try req.requireAuthenticated(User.self)
-        return Future.map(on: req) { return user }
-    }
-    
-    func updateProfile(_ req: Request) throws -> Future<(User)> {
-        let user = try req.requireAuthenticated(User.self)
-        return try req.content.decode(User.self).flatMap { updatedUser in
-            if updatedUser.id != user.id {
-                struct BadAccount: Error {
-                    let desc = "BAD"
-                }
-                return req.future(error: BadAccount())
-            }
-            return updatedUser.save(on: req)
         }
     }
     
