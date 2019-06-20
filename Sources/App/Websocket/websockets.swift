@@ -5,11 +5,11 @@ public func sockets(_ websockets: NIOWebSocketServer) {
     let sessionManager = RoomSessionManager.rooms
     
     // Create a WebSocket handler at /listen
-    websockets.get("join", RoomSession.parameter) { ws, req in
+    websockets.get("join", String.parameter) { ws, req in
         //get session ID from the URL
-        let session = try req.parameters.next(RoomSession.self)
+        let session = try req.parameters.next(String.self)
         //Ensure the session is valid, if not close it
-        guard sessionManager.sessions[session] != nil else {
+        guard sessionManager.connections[session] != nil else {
             ws.close()
             return
         }
@@ -19,7 +19,7 @@ public func sockets(_ websockets: NIOWebSocketServer) {
 }
 
 extension WebSocket {
-    func send(_ object: GameUpdate) {
+    func send(_ object: RoomSession) {
         let encoder = JSONEncoder()
         guard let data = try? encoder.encode(object) else { return }
         send(String(data: data, encoding: .utf8)!)

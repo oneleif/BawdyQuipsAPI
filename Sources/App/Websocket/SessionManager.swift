@@ -5,21 +5,24 @@ import WebSocket
 // in production scenarios, this will not be scalable beyond a single server
 // make sure to configure appropriately with a database like Redis to properly
 // scale
+
+typealias Connections = (room: RoomSession, sessions: [WebSocket])
+
 final class RoomSessionManager {
-    private(set) var sessions: LockedDictionary<RoomSession, [WebSocket]> = [:]
+    private(set) var connections: LockedDictionary<String, Connections> = [:]
     
     public static var rooms: RoomSessionManager = {
         return RoomSessionManager()
     }()
     
     // MARK: Observer Interactions
-    func add(listener: WebSocket, to session: RoomSession) {
+    func add(listener: WebSocket, to session: String) {
         //verify session exists
-        guard var listeners = sessions[session] else { return }
+        guard var listeners = connections[session]?.1 else { return }
         
         //add observer's websocket to our listeners
         listeners.append(listener)
-        sessions[session] = listeners
+        connections[session]?.sessions = listeners
         
         //remove client room listeners on close
         listener.onClose.always { [weak self, weak listener] in
@@ -28,45 +31,42 @@ final class RoomSessionManager {
         }
     }
     
-    func remove(listener: WebSocket, from session: RoomSession) {
-        guard var listeners = sessions[session] else { return }
+    func remove(listener: WebSocket, from session: String) {
+        guard var listeners = connections[session]?.sessions else { return }
         listeners = listeners.filter { $0 !== listener }
-        sessions[session] = listeners
+        connections[session]?.sessions = listeners
     }
 
     // MARK: Poster Interactions
-    func createRoomSession(for request: Request) -> Future<RoomSession> {
+    func createRoomSession(for request: Request) -> Future<String> {
         //Create session ID
         return wordKey(with: request)
-            .flatMap(to: RoomSession.self) { [unowned self] key -> Future<RoomSession> in
-                //Create RoomSession for this session with ID
-                let session = RoomSession(id: key, update: GameUpdate(), room: Room(id: key))
-                //Ensure the ID is unique, if not generate a new one
-                guard self.sessions[session] == nil else {
+            .flatMap(to: String.self) { [unowned self] key -> Future<String> in                //Ensure the ID is unique, if not generate a new one
+                guard self.connections[key] == nil else {
                     return self.createRoomSession(for: request)
                 }
-                
+                let connection: Connections = (room: RoomSession(), sessions: [WebSocket]())
                 //Record the new RoomSession and give it no observers
-                self.sessions[session] = []
+                self.connections[key] = connection
                 
                 
-                return Future.map(on: request) { session }
+                return Future.map(on: request) { key }
         }
     }
 
     //when a Poster sends an update, send to each registered observer
-    func update(_ object: GameUpdate, for session: RoomSession) {
-        guard let listeners = sessions[session] else { return }
+    func update(_ object: RoomSession, for session: String) {
+        guard let listeners = connections[session]?.sessions else { return }
         listeners.forEach { ws in ws.send(object) }
     }
 
     //close the Observer's webSocket
-    func close(_ session: RoomSession) {
-        guard let listeners = sessions[session] else { return }
+    func close(_ session: String) {
+        guard let listeners = connections[session]?.sessions else { return }
         listeners.forEach { ws in
             ws.close()
         }
-        sessions[session] = nil
+        connections[session] = nil
     }
 }
 

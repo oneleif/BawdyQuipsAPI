@@ -11,45 +11,29 @@ import Vapor
 class WebSocketController: RouteCollection {
     func boot(router: Router) throws {
         let sessionManager = RoomSessionManager.rooms
-    
+        
         router.post("create", use: sessionManager.createRoomSession)
         
-        router.post("close", RoomSession.parameter) { req -> HTTPStatus in
-            let session = try req.parameters.next(RoomSession.self)
+        router.post("close", String.parameter) { req -> HTTPStatus in
+            let session = try req.parameters.next(String.self)
             sessionManager.close(session)
             return .ok
         }
         
-        router.post("update", RoomSession.parameter) { req -> Future<View> in
+        router.post("update", String.parameter) { req -> Future<View> in
             // get session ID from the URL
-            let session = try req.parameters.next(RoomSession.self)
+            let session = try req.parameters.next(String.self)
             // create a room update from the POST request body
-            return try RoomUpdate.decode(from: req).flatMap(to: View.self) { roomUpdate in
+            return try RoomSession.decode(from: req).flatMap(to: View.self) { roomSession in
                 
-                // broadcast the room update
-                return try roomUpdate.getUpdate(req).flatMap(to: View.self) { update in
-                    
-                    guard let updateType = update.updateType,
-                        let sessionUpdate = session.update,
-                        let scene = update.scene else {
+                guard let update = roomSession.update,
+                    let room = roomSession.room else {
                         return try req.view().render("Children/lobby")
-                    }
-                    
-                    // TODO: Update
-                    switch updateType {
-                    case .CreateLobby:
-                        print("wut")
-                    case .GoToGame:
-                        print("butt")
-                    default:
-                        print("nothing")
-                    }
-                    
-                    
-                    let context = GameContext(sessionID: session.id, update: sessionUpdate)
-                    sessionManager.update(update, for: session)
-                    var view: String
-                    
+                }
+                
+                var view: String = "Children/lobby"
+                
+                if let scene = update.scene {
                     switch scene {
                     case .Lobby:
                         view = "Children/lobby"
@@ -60,9 +44,13 @@ class WebSocketController: RouteCollection {
                     case .Scoreboard:
                         view = "Children/scoreboard"
                     }
-                    
-                    return try req.view().render(view, context)
                 }
+                
+                let context = GameContext(sessionID: session, update: update)
+                sessionManager.update(roomSession, for: session)
+                
+                return try req.view().render(view, context)
+                
             }
         }
     }

@@ -11,22 +11,20 @@ import Authentication
 
 final class Room: Codable, Hashable {
     static func == (lhs: Room, rhs: Room) -> Bool {
-        return lhs.id == rhs.id
+        return lhs.admin == rhs.admin
     }
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        hasher.combine(admin)
     }
     
-    var id: String
     var admin: User.ID?
-    var users: [User.ID]
+    var users: [User.ID]?
     var judge: User.ID?
     var currentPrompt: Card?
-    var cardDeck : CardDeck
+    var cardDeck : CardDeck?
     
-    init(id: String) {
-        self.id = id
+    init() {
         self.admin = nil
         self.users = []
         self.judge = nil

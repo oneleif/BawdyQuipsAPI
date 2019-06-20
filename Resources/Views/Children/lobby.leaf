@@ -5,7 +5,7 @@
 	<div>
         <p>Room code: #(sessionID)</p>
 	</div>
-    #for(player in players){
+    #for(player in room.users){
     <div styles="height:60px;">
             <p>#(player)</p>
 			<p>#(player.isReady)</p>
