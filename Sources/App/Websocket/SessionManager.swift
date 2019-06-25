@@ -19,10 +19,11 @@ final class RoomSessionManager {
     func add(listener: WebSocket, to session: String) {
         //verify session exists
         guard var listeners = connections[session]?.1 else { return }
-        
         //add observer's websocket to our listeners
         listeners.append(listener)
         connections[session]?.sessions = listeners
+        
+//        connections[session]?.room.room?.users?.append(user)
         
         //remove client room listeners on close
         listener.onClose.always { [weak self, weak listener] in
@@ -45,7 +46,7 @@ final class RoomSessionManager {
                 guard self.connections[key] == nil else {
                     return self.createRoomSession(for: request)
                 }
-                let connection: Connections = (room: RoomSession(), sessions: [WebSocket]())
+                let connection: Connections = (room: RoomSession(update: nil, room: Room()), sessions: [WebSocket]())
                 //Record the new RoomSession and give it no observers
                 self.connections[key] = connection
                 

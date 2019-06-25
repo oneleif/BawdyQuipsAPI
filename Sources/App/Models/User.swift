@@ -19,6 +19,11 @@ struct GameScore: Codable {
     }
 }
 
+struct LoginPostData: Content {
+    let username: String
+    let password: String
+}
+
 final class User: SQLiteModel, Codable, Hashable {
     static func == (lhs: User, rhs: User) -> Bool {
         return lhs.id == rhs.id
@@ -36,6 +41,8 @@ final class User: SQLiteModel, Codable, Hashable {
     var password: String
     
     // Game Data
+    var roomID: String?
+    var isReady: Bool
     var currentScore: GameScore
     var totalScore: GameScore
     
@@ -44,11 +51,15 @@ final class User: SQLiteModel, Codable, Hashable {
     init(id: Int? = nil,
          username: String,
          password: String,
+         roomID: String? = nil,
+         isReady: Bool = false,
          currentScore: GameScore = GameScore.zero,
          totalScore: GameScore = GameScore.zero) {
         self.id = id
         self.username = username
         self.password = password
+        self.roomID = roomID
+        self.isReady = isReady
         self.currentScore = currentScore
         self.totalScore = totalScore
     }

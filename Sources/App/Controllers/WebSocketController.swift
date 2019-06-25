@@ -7,20 +7,25 @@
 
 import Foundation
 import Vapor
+import Authentication
+import FluentSQL
 
 class WebSocketController: RouteCollection {
     func boot(router: Router) throws {
         let sessionManager = RoomSessionManager.rooms
         
-        router.post("create", use: sessionManager.createRoomSession)
+        let authSessionRouter = router.grouped(User.authSessionsMiddleware())
+        let protectedRouter = authSessionRouter.grouped(RedirectMiddleware<User>(path: "/login"))
         
-        router.post("close", String.parameter) { req -> HTTPStatus in
+        protectedRouter.post("create", use: sessionManager.createRoomSession)
+        
+        protectedRouter.post("close", String.parameter) { req -> HTTPStatus in
             let session = try req.parameters.next(String.self)
             sessionManager.close(session)
             return .ok
         }
         
-        router.post("update", String.parameter) { req -> Future<View> in
+        protectedRouter.post("update", String.parameter) { req -> Future<View> in
             // get session ID from the URL
             let session = try req.parameters.next(String.self)
             // create a room update from the POST request body
@@ -28,35 +33,81 @@ class WebSocketController: RouteCollection {
                 
                 guard let update = roomSession.update,
                     let room = roomSession.room else {
+                        
                         return try req.view().render("Children/lobby")
                 }
                 
-                var view: String = "Children/lobby"
-                
-                if let scene = update.scene {
-                    switch scene {
-                    case .Lobby:
-                        view = "Children/lobby"
-                    case .Playing:
-                        view = "Children/game"
-                    case .Voting:
-                        view = "Children/voting"
-                    case .Scoreboard:
-                        view = "Children/scoreboard"
+                //inital update: courtesy to set up room
+                if let type = update.updateType,
+                    let user = update.user,
+                    type == .PlayerJoined,
+                    let xyz = sessionManager.connections[session]?.room.room {
+                    
+                    //if there's no users in the room, make this one the admin
+                    if var users = room.users {
+                        users.append(user)
+                    } else {
+                        xyz.admin = user
+                        xyz.users = [user]
                     }
                 }
                 
-                let context = GameContext(sessionID: session, update: update)
+                
+                
+                var view: String = "Children/lobby"
+                
+                if let scene = update.updateType {
+                    switch scene {
+                    case .GoToLobby, .PlayerJoined:
+                        //TODO: init cards and the rest of room
+                        return try self.getLobby(req: req, id: session, room: room)
+                    case .GoToGame, .SelectCard:
+                        view = "Children/game"
+                    case .GoToVoting, .VoteForAnswer:
+                        view = "Children/voting"
+                    case .GoToScoring:
+                        view = "Children/scoreboard"
+                    }
+                    
+                }
+                
                 sessionManager.update(roomSession, for: session)
                 
-                return try req.view().render(view, context)
+                return try req.view().render(view)
                 
             }
         }
     }
+    
+    func getLobby(req: Request, id: String, room: Room) throws -> Future<View> {
+        guard let users = room.users else {
+            return try req.view().render("Children/lobby")
+        }
+        
+        // Query 1st
+        return User.query(on: req)
+            .filter(\User.roomID == id)
+            .all()
+            .flatMap { (users) -> Future<View> in
+            let states: [UserLobbyState] = users.map { (user) -> UserLobbyState in
+                return UserLobbyState(user: user.username, readyState: user.isReady)
+            }
+            return try req.view().render("Children/lobby",
+                                         LobbyContext(sessionID: id, states: states))
+        }
+    }
 }
 
-struct GameContext: Encodable{
+struct XYZContext: Encodable {
+    let lobby: LobbyContext?
+}
+
+struct LobbyContext: Encodable{
     let sessionID: String
-    let update: GameUpdate
+    let states: [UserLobbyState]
+}
+
+struct UserLobbyState: Encodable{
+    let user: String
+    let readyState: Bool
 }
