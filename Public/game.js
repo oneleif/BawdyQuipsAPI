@@ -90,6 +90,7 @@ function createRoom() {
 function joinRoom() {
 	var id = document.getElementById("joinRoomCode").value;
 	roomID = id;
+    console.log("joinRoom(): starting websocket");
 	var socket = new WebSocket("ws://" + ip + ":" + port + "/join/" + id);
 	socket.onmessage = function (event) {
 		console.log("event: " + event.data + "\n");
@@ -100,7 +101,9 @@ function joinRoom() {
 		//TODO: send another update for GoToLobby
 	};
 	
+    console.log("joinRoom(): starting lobbyInit()");
 	lobbyInit();
+    console.log("joinRoom(): starting updateRoom()");
 	updateRoom();
 }
 
@@ -116,7 +119,7 @@ function lobbyInit() {
 	var courtestRoomUpdate = new RoomUpdate(0, userID, false);
 	var courtesyRoomSession = new RoomSession(roomID, roomUpdate);
 	
-	xhttp.open("POST", "http://" + ip + ":" + port + "/api/lobby/init" + roomID, true);
+	xhttp.open("POST", "http://" + ip + ":" + port + "/api/lobby/init/" + roomID, true);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send(JSON.stringify(courtesyRoomSession));
 }
@@ -138,11 +141,13 @@ function updateRoom() {
 function unready() {
 	roomSession.update.updateType = 1;
 	roomSession.update.isReady = false;
+    console.log("unready(): starting updateRoom()");
 	updateRoom();
 }
 
 function ready() {
 	roomSession.update.updateType = 1;
 	roomSession.update.isReady = true;
+    console.log("ready(): starting updateRoom()");
 	updateRoom();
 }

@@ -19,7 +19,7 @@ class RoomUpdateController: RouteCollection {
         
         let protectedRouter = authSessionRouter.grouped(RedirectMiddleware<User>(path: "/login"))
         
-        protectedRouter.post("api", "lobby", "init", use: lobbyInit)
+        protectedRouter.post("api", "lobby", "init", String.parameter, use: lobbyInit)
     }
     
     func lobbyInit(_ req: Request) throws -> Future<RoomSession>{
@@ -44,12 +44,19 @@ class RoomUpdateController: RouteCollection {
                 } else {
                     serverRoom.admin = user
                     serverRoom.users = [user]
+                    
+                    let answers : [Card] = []
+                    let prompts : [Card] = []
+                    // TODO: get the cards set up for the room
+                    serverRoom.cardDeck = CardDeck(answers: answers, prompts: prompts)
                 }
+                
+                
                 
                 serverSession.update = update
                 
                 return Future.map(on: req) {
-                    RoomSession(update: nil, room: nil)
+                    RoomSession(update: update, room: serverRoom)
                 }
                 
                 
