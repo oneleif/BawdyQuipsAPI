@@ -1,13 +1,16 @@
 #set("content") {
 <h3>Get in a game</h3>
 
-<div>
-    <button type="button" onclick="createRoom()">Create Room</button>
-</div>
-
-<div>
-    <button type="button" onclick="joinRoom()">Join Room</button>
-    <input id="joinRoomCode">
+<div class="eventCard">
+	<div>
+		<button type="button" class="btn btn-success" onclick="createRoom()">Create Room</button>
+	</div>
+	
+	<div>
+		<button type="button" class="btn btn-warning" onclick="joinRoom()">Join Room</button>
+		
+		<input id="joinRoomCode">
+	</div>
 </div>
 }
 

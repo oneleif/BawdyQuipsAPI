@@ -1,7 +1,7 @@
 import Vapor
 
 struct RoomSession: Content, Hashable {
-    let update: GameUpdate?
+    var update: GameUpdate?
     let room: Room?
     
     init(update: GameUpdate? = nil, room: Room? = nil) {

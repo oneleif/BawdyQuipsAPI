@@ -32,27 +32,10 @@ class WebSocketController: RouteCollection {
             return try RoomSession.decode(from: req).flatMap(to: View.self) { roomSession in
                 
                 guard let update = roomSession.update,
-                    let room = roomSession.room else {
+                    let room = sessionManager.connections[session]?.room.room else {
                         
                         return try req.view().render("Children/lobby")
                 }
-                
-                //inital update: courtesy to set up room
-                if let type = update.updateType,
-                    let user = update.user,
-                    type == .PlayerJoined,
-                    let xyz = sessionManager.connections[session]?.room.room {
-                    
-                    //if there's no users in the room, make this one the admin
-                    if var users = room.users {
-                        users.append(user)
-                    } else {
-                        xyz.admin = user
-                        xyz.users = [user]
-                    }
-                }
-                
-                
                 
                 var view: String = "Children/lobby"
                 
