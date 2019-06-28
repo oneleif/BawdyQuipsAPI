@@ -35,12 +35,15 @@ class RoomUpdateController: RouteCollection {
                     type == .PlayerJoined,
                     let serverRoom = self.sessionManager.connections[session]?.room.room,
                     var serverSession = self.sessionManager.connections[session]?.room else {
-                        return Future.map(on: req) { self.sessionManager.connections[session]!.room }
+                        return Future.map(on: req) { self.sessionManager.connections[session]?.room ?? RoomSession() }
                 }
                 
                 //if there's no users in the room, make this one the admin
                 if var users = serverRoom.users {
                     users.append(user)
+                    serverRoom.users = users
+                    
+                    l("ServerRoom User IDs: \(serverRoom.users ?? [])")
                 } else {
                     serverRoom.admin = user
                     serverRoom.users = [user]
@@ -52,12 +55,35 @@ class RoomUpdateController: RouteCollection {
                 }
                 
                 
+                self.sessionManager.update(serverSession, for: session)
                 
-                serverSession.update = update
                 
-                return Future.map(on: req) {
-                    RoomSession(update: update, room: serverRoom)
+                return User.query(on: req)
+                    .filter(\.id, .equal, user)
+                    .all()
+                    .flatMap { player in
+                        l("players with id(\(user)): \(player)")
+                        guard let player = player.first else {
+                            return Future.map(on: req) {
+                                RoomSession(update: serverSession.update, room: serverRoom)
+                            }
+                        }
+                        player.roomID = session
+                        serverSession.update = update
+                        l("player.roomID: \(player.roomID ?? "-1")")
+                        l("ServerUpdate: \(update)")
+                        return player.save(on: req).flatMap { _ in
+                            return Future.map(on: req) {
+                                RoomSession(update: serverSession.update, room: serverRoom)
+                            }
+                        }
+                        
+                        
                 }
+                
+                
+                
+                
                 
                 
         }

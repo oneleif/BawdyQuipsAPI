@@ -35,9 +35,9 @@ class UserController: RouteCollection {
         router.get("logout", use: logout)
     }
     
-    func getAuthUser(_ req: Request) throws -> String {
+    func getAuthUser(_ req: Request) throws -> User {
         let x = try req.requireAuthenticated(User.self)
-        return x.id?.description ?? ""
+        return x
     }
     
     // MARK: View Handlers

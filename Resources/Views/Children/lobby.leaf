@@ -3,9 +3,9 @@
 
 <div>
 	<div>
-        <p>Room code: #(lobby.sessionID)</p>
+        <p>Room code: #(sessionID)</p>
 	</div>
-    #for(state in lobby.states){
+    #for(state in states){
         <div styles="height:60px;">
             <p>#(state.user)</p>
 			<p>#(state.readyState)</p>

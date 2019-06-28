@@ -10,3 +10,9 @@ public func app(_ env: Environment) throws -> Application {
     try boot(app)
     return app
 }
+
+let logging = true
+
+func l(_ value: String) {
+    print("\(Date()):\t\(value)")
+}

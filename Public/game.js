@@ -24,6 +24,7 @@ class Room{
 	}
 }
 
+var user = Object();
 var userID = 0;
 var roomID = "";
 var roomUpdate = new RoomUpdate(0, 0, false);
@@ -63,8 +64,15 @@ function getAuthUser() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
-			userID = this.responseText;
-		}
+            user = JSON.parse(this.responseText);
+			userID = user.id;
+            console.log("getAuthUser(): user: " + this.responseText);
+            console.log("getAuthUser(): userID: " + userID);
+            console.log("getAuthUser(): starting lobbyInit()");
+            lobbyInit();
+            console.log("getAuthUser(): starting updateRoom()");
+            updateRoom();
+        }
 	};
 	
 	xhttp.open("GET", "http://" + ip + ":" + port + "/getAuthUser", true);
@@ -94,34 +102,63 @@ function joinRoom() {
 	var socket = new WebSocket("ws://" + ip + ":" + port + "/join/" + id);
 	socket.onmessage = function (event) {
 		console.log("event: " + event.data + "\n");
-        
+        updateView();
 		//send an update to initialize the room's admin and users
         
 		
 		//TODO: send another update for GoToLobby
 	};
-	
-    console.log("joinRoom(): starting lobbyInit()");
-	lobbyInit();
-    console.log("joinRoom(): starting updateRoom()");
-	updateRoom();
+    getAuthUser();
 }
+
 
 function lobbyInit() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			console.log("lobbyInit(): response:" + this.responseText);
-			roomSession = this.responseText;
+			roomSession = JSON.parse(this.responseText);
 		}
 	};
+    
+    var update = {
+        user: user.id,
+        updateType: 0,
+        isReady: false
+        
+    };
+    roomSession.update = update;
 	
-	var courtestRoomUpdate = new RoomUpdate(0, userID, false);
-	var courtesyRoomSession = new RoomSession(roomID, roomUpdate);
-	
+    console.log("lobbyInit(): roomSession.update.user:" + roomSession.update.user);
+    console.log("lobbyInit(): roomSession.update.updateType:" + roomSession.update.updateType);
+    console.log("lobbyInit(): roomSession.update.isReady:" + roomSession.update.isReady);
+    
 	xhttp.open("POST", "http://" + ip + ":" + port + "/api/lobby/init/" + roomID, true);
 	xhttp.setRequestHeader("Content-type", "application/json");
-	xhttp.send(JSON.stringify(courtesyRoomSession));
+	xhttp.send(JSON.stringify(roomSession));
+}
+
+function updateView() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log("UPDATEVIEW(): OK");
+            document.open();
+            document.write(this.responseText);
+            document.close();
+        }
+    };
+    console.log("UPDAETVIEW!!!!");
+    xhttp.open("POST", "http://" + ip + ":" + port + "/updateView/" + roomID, true);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    
+    var update = {
+    updateType: 1
+    };
+    
+    roomSession.update = update;
+    
+    xhttp.send(JSON.stringify(roomSession));
 }
 
 function updateRoom() {
@@ -129,7 +166,9 @@ function updateRoom() {
 	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			console.log("updateRoom(): OK");
+            document.open();
 			document.write(this.responseText);
+            document.close();
 		}
 	};
 	
