@@ -5,17 +5,17 @@
 	<div>
         <p>Room code: #(sessionID)</p>
 	</div>
-    #for(player in room.users){
-    <div styles="height:60px;">
-            <p>#(player)</p>
-			<p>#(player.isReady)</p>
+    #for(state in states){
+        <div styles="height:60px;">
+            <p>#(state.user)</p>
+			<p>#(state.readyState)</p>
         </div>
     }
 </div>
 
 <div>
-	<button type="button" onClick="Ready()">Ready up</button>
+	<button type="button" onClick="ready()">Ready up</button>
 </div>
 }
 
-#embed("base")
+#embed("authBase")

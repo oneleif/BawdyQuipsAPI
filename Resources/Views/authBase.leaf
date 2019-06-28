@@ -10,10 +10,12 @@
 	
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	
+	<script src = "game.js" type = "text/javascript" ></script>
+	
 	<title>#(title)</title>
 </head>
 <body>
-	<nav class="navbar navbar-expand-md navbar-dark bg-dark"><a class="navbar-brand" href="/">Visual</a>
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark"><a class="navbar-brand" href="/">BawdyQuips</a>
 		
 		<button class="navbar-toggler" type="button"
         data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -24,8 +26,8 @@
         id="navbarSupportedContent">
 			<ul class="navbar-nav mr-auto">
 				<li class="nav-item #if(title == "Home"){active}"><a href="/" class="nav-link">Home</a></li>
-				<li class="nav-item #if(title == "Solutions"){active}"><a href="/solutions" class="nav-link">Solutions</a></li>
-				<li class="nav-item #if(title == "Add Solution"){active}"><a href="/newSolution" class="nav-link">Add Solution</a></li>
+				<li class="nav-item #if(title == "Cards"){active}"><a href="/cards" class="nav-link">Cards</a></li>
+				<li class="nav-item #if(title == "Add Card"){active}"><a href="/addCard" class="nav-link">Add Card</a></li>
 			</ul>
 			
 			<ul class="navbar-nav mr-right">

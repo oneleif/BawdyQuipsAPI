@@ -19,7 +19,10 @@ extension Array {
     #else
     idx = Int(arc4random_uniform(UInt32(count)))
     #endif
-    
+    // TODO: FFS
+    // Issue: Index out of range
+    // case:
+    // idx = 0
     return self[idx - 1]
   }
 }

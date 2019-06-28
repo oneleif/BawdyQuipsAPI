@@ -1,0 +1,35 @@
+#set("content") {
+
+<h1>#(title)</h1>
+
+<div class="eventBackground">
+	<form method="post" action="/cards">
+		<div class="eventCard">
+			
+			<div class="form-group">
+				<label for="json">Card Text </label>
+				
+				<textarea rows="10" type="json" name="description" class="form-control"
+				id="json" required></textarea>
+				
+				<p>If the card is a prompt, denote blanks with "_" (i.e. "Armadillos smell like _")</p>
+			</div>
+			
+			<div class="form-group" hidden>
+				<input type="number" name="authorId" class="form-control"
+				id="authorId" value="#(user.id)" step="1">
+			</div>
+		</div>
+		
+		<div class="updateButtons">
+			<button type="submit" class="btn btn-primary">Add Card</button>
+		</div>
+		
+		
+	</form>
+</div>
+
+}
+
+#embed("authBase")
+
