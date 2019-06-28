@@ -64,7 +64,7 @@ class WebSocketController: RouteCollection {
             }
         }
         
-        protectedRouter.post("updateView", String.parameter) { req -> Future<View> in
+        protectedRouter.post("refreshView", String.parameter) { req -> Future<View> in
             // get session ID from the URL
             let session = try req.parameters.next(String.self)
             // create a room update from the POST request body
