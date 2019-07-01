@@ -6,7 +6,7 @@
         <p>Room code: #(sessionID)</p>
 	</div>
     #for(state in states){
-        <div styles="height:60px;">
+        <div styles="height:60px;" class="lobbyReady">
             <p>#(state.user)</p>
 			<p>#(state.readyState)</p>
         </div>

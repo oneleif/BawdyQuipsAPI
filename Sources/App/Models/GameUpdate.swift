@@ -14,6 +14,7 @@ struct GameUpdate: Content, CustomStringConvertible {
     
     enum UpdateType: Int, Codable {
         case PlayerJoined
+        case ReadyUp
         case GoToLobby
         case GoToGame
         case SelectCard
