@@ -38,6 +38,27 @@ function index() {
 	xhttp.send();
 }
 
+function getAuthUser() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+            console.log("getAuthUser(): user: " + this.responseText);
+            console.log("getAuthUser(): userID: " + user.id);
+            
+            user = JSON.parse(this.responseText);
+			userID = user.id;
+            
+            console.log("getAuthUser(): starting lobbyInit()");
+            lobbyInit();
+            console.log("getAuthUser(): starting updateRoom()");
+            updateRoom();
+        }
+	};
+	
+	xhttp.open("GET", "http://" + ip + ":" + port + "/getAuthUser", true);
+	xhttp.send();
+}
+
 function createRoom() {
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function () {
@@ -112,16 +133,17 @@ function lobbyInit() {
 	xhttp.send(JSON.stringify(roomSession));
 }
 
-function updateView() {
+function refreshView() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            console.log("UPDATEVIEW(): OK");
+            console.log("refreshView(): OK");
             document.open();
             document.write(this.responseText);
             document.close();
         }
     };
+
     console.log("UpdateView(): roomID: " + roomID);
     xhttp.open("POST", "http://" + ip + ":" + port + "/updateView/" + roomID, true);
     xhttp.setRequestHeader("Content-type", "application/json");
