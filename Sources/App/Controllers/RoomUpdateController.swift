@@ -74,7 +74,8 @@ class RoomUpdateController: RouteCollection {
                         l("ServerUpdate: \(update)")
                         return player.save(on: req).flatMap { _ in
                             return Future.map(on: req) {
-                                RoomSession(update: serverSession.update, room: serverRoom)
+                                
+                                return RoomSession(update: serverSession.update, room: serverRoom)
                             }
                         }
                         

@@ -54,30 +54,28 @@ class WebSocketController: RouteCollection {
         
         guard let update = roomSession.update,
             let updateType = update.updateType else {
-            return Future.map(on: req) { self.sessionManager.connections[session]?.room ?? roomSession }
+                return Future.map(on: req) { self.sessionManager.connections[session]?.room ?? roomSession }
         }
-        
-        
-        switch updateType {
-        case .ReadyUp:
-            return User.query(on: req).filter(\.id, .equal, update.user ?? -1).all()
-                .flatMap { user in
-                    guard let user = user.first else {
-                        return Future.map(on: req) { self.sessionManager.connections[session]?.room ?? roomSession }
-                    }
-                    
-                    user.isReady = update.isReady ?? false
-                    
-                    return user.save(on: req).flatMap { _ in
-                        return Future.map(on: req) { self.sessionManager.connections[session]?.room ?? roomSession }
-                    }
-            }
-        default:
-            print("qwerty")
+        return User.query(on: req).filter(\.id, .equal, update.user ?? -1).all()
+            .flatMap { user in
+                guard let user = user.first else {
+                    return Future.map(on: req) { self.sessionManager.connections[session]?.room ?? roomSession }
+                }
+                
+                
+                switch updateType {
+                case .ReadyUp:
+                    // TODO
+                    return try self.sessionManager.connections[session]!.gameManager.handleReadyUp(req, user: user)
+                case .GoToGame:
+                    print("go go go")
+                default:
+                    print("qwerty")
+                }
+                
+                
+                return Future.map(on: req) { self.sessionManager.connections[session]?.room ?? roomSession }
         }
-        
-        
-         return Future.map(on: req) { self.sessionManager.connections[session]?.room ?? roomSession }
     }
     
     
