@@ -42,8 +42,6 @@ class RoomUpdateController: RouteCollection {
                 if var users = serverRoom.users {
                     users.append(user)
                     serverRoom.users = users
-                    
-                    l("ServerRoom User IDs: \(serverRoom.users ?? [])")
                 } else {
                     serverRoom.admin = user
                     serverRoom.users = [user]
@@ -55,14 +53,13 @@ class RoomUpdateController: RouteCollection {
                 }
                 
                 
-                self.sessionManager.update(serverSession, for: session)
+                defer { self.sessionManager.update(serverSession, for: session) }
                 
                 
                 return User.query(on: req)
                     .filter(\.id, .equal, user)
                     .all()
                     .flatMap { player in
-                        l("players with id(\(user)): \(player)")
                         guard let player = player.first else {
                             return Future.map(on: req) {
                                 RoomSession(update: serverSession.update, room: serverRoom)
@@ -70,12 +67,10 @@ class RoomUpdateController: RouteCollection {
                         }
                         player.roomID = session
                         serverSession.update = update
-                        l("player.roomID: \(player.roomID ?? "-1")")
-                        l("ServerUpdate: \(update)")
                         return player.save(on: req).flatMap { _ in
                             return Future.map(on: req) {
                                 
-                                return RoomSession(update: serverSession.update, room: serverRoom)
+                                return RoomSession(update: serverSession.update, room: serverRoom, id: session)
                             }
                         }
                         

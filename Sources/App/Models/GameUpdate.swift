@@ -28,9 +28,6 @@ struct GameUpdate: Content, CustomStringConvertible {
     // The user sending the update
     var user: User.ID?
     
-    //Lobby scene
-    var isReady: Bool?
-    
     //Playing Scene
     var hands: [User.ID: [Card.ID]]?
     var playerSelectedCards: [Card.ID]?

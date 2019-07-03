@@ -20,7 +20,7 @@ struct GameManager {
     }
     
     func handleReadyUp(_ req: Request, user: User) throws -> Future<RoomSession> {
-        user.isReady = update.isReady ?? false
+        user.isReady.toggle()
         
         return user.save(on: req).flatMap { _ in
             return try self.sendRoomSession(req)

@@ -14,7 +14,7 @@
 </div>
 
 <div>
-	<button type="button" onClick="ready()">Ready up</button>
+	<button type="button" class="btn btn-primary" onClick="ready()">Ready up</button>
 </div>
 }
 

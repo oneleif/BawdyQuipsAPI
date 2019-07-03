@@ -160,7 +160,6 @@ class WebSocketController: RouteCollection {
                 let states: [UserLobbyState] = users.map { (user) -> UserLobbyState in
                     return UserLobbyState(user: user.username, readyState: user.isReady)
                 }
-                l("States: \(states) (id: \(id))")
                 return try req.view().render("Children/lobby",
                                              LobbyContext(sessionID: id, states: states))
         }

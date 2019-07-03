@@ -1,28 +1,61 @@
-var user = Object();
-var userID = 0;
+let user = Object();
+let userID = 0;
 
-var update = {
+let update = {
 	updateType: 0,
 	user: 0,
 	isReady: false
 };
 
-var room = {
+let room = {
 	user: 0
 };
 
-var roomSession = {
+let roomSession = {
 	id: "",
 	update: update,
 	room: room
 };
 
-var ip = "localhost";
-var port = "8080";
+const ip = "localhost";
+const port = "8080";
+
+function register() {
+	const xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			document.body.innerHTML = this.responseText;
+		}
+	};
+	let newUser = {};
+	newUser.username = document.getElementById("username").value;
+	newUser.password = document.getElementById("password").value;
+
+	xhttp.open("POST", "http://" + ip + ":" + port + "/register", true);
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send(JSON.stringify(newUser));
+}
+
+function login() {
+	const xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			document.body.innerHTML = this.responseText;
+			getAuthUser();
+		}
+	};
+	let userLogin = {};
+	userLogin.username = document.getElementById("username").value;
+	userLogin.password = document.getElementById("password").value;
+
+	xhttp.open("POST", "http://" + ip + ":" + port + "/login", true);
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send(JSON.stringify(userLogin));
+}
 
 // View Handlers
 function index() {
-	var xhttp = new XMLHttpRequest();
+	const xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			document.body.innerHTML = this.responseText;
@@ -35,14 +68,11 @@ function index() {
 }
 
 function getAuthUser() {
-	var xhttp = new XMLHttpRequest();
+	const xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
             user = JSON.parse(this.responseText);
 			userID = user.id;
-            
-            lobbyInit();
-            updateRoom();
         }
 	};
 	xhttp.open("GET", "http://" + ip + ":" + port + "/getAuthUser", true);
@@ -50,7 +80,7 @@ function getAuthUser() {
 }
 
 function createRoom() {
-	var xhttp = new XMLHttpRequest();
+	const xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			roomSession.id = this.responseText;
@@ -65,39 +95,26 @@ function createRoom() {
 }
 
 function joinRoom() {
-	getAuthUser();
 	roomSession.id = document.getElementById("joinRoomCode").value;
-	
-	var socket = new WebSocket("ws://" + ip + ":" + port + "/join/" + roomSession.id);
+
+	const socket = new WebSocket("ws://" + ip + ":" + port + "/join/" + roomSession.id);
 	socket.onmessage = function (event) {
         refreshView();
 	};
-}
 
-function getAuthUser() {
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-		user = JSON.parse(this.responseText);
-		userID = user.id;
-		lobbyInit();
-		sendJoinedRoomUpdate();
-	  }
-	};
-	
-	xhttp.open("GET", "http://" + ip + ":" + port + "/getAuthUser", true);
-	xhttp.send();
+	lobbyInit();
+	refreshView();
 }
 
 function lobbyInit() {
-	var xhttp = new XMLHttpRequest();
+	const xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			roomSession = JSON.parse(this.responseText);
 		}
 	};
 
-    var update = {
+    let update = {
         user: user.id,
         updateType: 0,
         isReady: false
@@ -111,7 +128,7 @@ function lobbyInit() {
 }
 
 function refreshView() {
-    var xhttp = new XMLHttpRequest();
+	const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             document.body.innerHTML = this.responseText;
@@ -124,7 +141,7 @@ function refreshView() {
 
 // ALL room updates are passed through here
 function sendRoomUpdate() {
-    var xhttp = new XMLHttpRequest();
+	const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             document.body.innerHTML = this.responseText;
@@ -138,7 +155,7 @@ function sendRoomUpdate() {
 
 function sendJoinedRoomUpdate() {
     // Send player joined request
-	var update = {
+	let update = {
 		updateType: 0
     };
     
