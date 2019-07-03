@@ -53,19 +53,6 @@ function login() {
 	xhttp.send(JSON.stringify(userLogin));
 }
 
-// View Handlers
-function index() {
-	const xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-			document.body.innerHTML = this.responseText;
-			getAuthUser();
-		}
-	};
-	
-	xhttp.open("GET", "http://" + ip + ":" + port + "/", true);
-	xhttp.send();
-}
 
 function getAuthUser() {
 	const xhttp = new XMLHttpRequest();
@@ -99,6 +86,8 @@ function joinRoom() {
 
 	const socket = new WebSocket("ws://" + ip + ":" + port + "/join/" + roomSession.id);
 	socket.onmessage = function (event) {
+		console.log(event.data);
+		// roomSession = JSON.parse(event.data);
         refreshView();
 	};
 
