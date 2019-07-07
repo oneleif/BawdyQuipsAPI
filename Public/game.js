@@ -86,13 +86,12 @@ function joinRoom() {
 
 	const socket = new WebSocket("ws://" + ip + ":" + port + "/join/" + roomSession.id);
 	socket.onmessage = function (event) {
-		console.log(event.data);
+		console.log("websocket event: " + event.data);
         roomSession = JSON.parse(event.data);
-        refreshView();
+        updateView();
 	};
 
 	lobbyInit();
-	refreshView();
 }
 
 function lobbyInit() {
@@ -100,9 +99,12 @@ function lobbyInit() {
 	xhttp.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
 			roomSession = JSON.parse(this.responseText);
+			console.log("lobbyInit() roomSession returned: " + this.responseText);
+			updateView();
 		}
 	};
 
+	//TODO its breaking here and not sending the user
     let update = {
         user: user.id,
         updateType: 0,
@@ -110,22 +112,35 @@ function lobbyInit() {
     };
 	
     roomSession.update = update;
-	
+
+	console.log("lobbyInit(): sent roomSession: " + JSON.stringify(roomSession));
 	xhttp.open("POST", "http://" + ip + ":" + port + "/api/lobby/init/" + roomSession.id, true);
 	xhttp.setRequestHeader("Content-type", "application/json");
 	xhttp.send(JSON.stringify(roomSession));
+
 }
 
-function refreshView() {
+function updateView() {
 	const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             document.body.innerHTML = this.responseText;
         }
     };
+
+	// let update = {
+	// 	user: user.id,
+	// 	updateType: 0,
+	// 	isReady: false
+	// };
+	//
+	// roomSession.update = update;
+
+	console.log("updateView() requesting updateType: " + roomSession.update.updateType);
     xhttp.open("POST", "http://" + ip + ":" + port + "/updateView/" + roomSession.id, true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(JSON.stringify(roomSession));
+
 }
 
 // ALL room updates are passed through here
@@ -140,6 +155,7 @@ function sendRoomUpdate() {
     xhttp.open("POST", "http://" + ip + ":" + port + "/update/" + roomSession.id, true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(JSON.stringify(roomSession));
+    console.log("update(): sending updateType: " + roomSession.update.updateType);
 }
 
 function sendJoinedRoomUpdate() {

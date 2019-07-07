@@ -37,6 +37,29 @@ struct GameUpdate: Content, CustomStringConvertible {
     // The user sending the update
     var user: User.ID?
     
+    // MARK: Player Joined
+    // if its the first player make them the admin
+    // MARK: Ready Up
+    // user.isReady
+    // MARK: Waiting For Game
+    // countdown
+    // MARK: GoToGame
+    //
+    
+    // MARK: SelectCard
+    // MARK: WaitingForVoting
+    // MARK: GoToVoting
+    
+    // MARK: VoteForAnswer
+    // MARK: WaitingForScoring
+    // MARK: GoToScoring
+    
+    // MARK: WaitingForLobby
+    // MARK: GoToLobby
+    
+    
+    
+    
     //Playing Scene
     var hands: [User.ID: [Card.ID]]?
     var playerSelectedCards: [Card.ID]?
