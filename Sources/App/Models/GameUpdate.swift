@@ -12,15 +12,24 @@ struct GameUpdate: Content, CustomStringConvertible {
         return "\(user ?? 0)"
     }
     
+    //TODO: create a subclass with the expected data for each enum value
     enum UpdateType: Int, Codable {
+        //In lobby
         case PlayerJoined
         case ReadyUp
-        case GoToLobby
+        case WaitingForGame
         case GoToGame
+        //In game
         case SelectCard
+        case WaitingForVoting
         case GoToVoting
+        //In voting
         case VoteForAnswer
+        case WaitingForScoring
         case GoToScoring
+        //In scoreboard
+        case WaitingForLobby
+        case GoToLobby
     }
     
     var updateType: UpdateType?

@@ -12,7 +12,6 @@ import FluentSQL
 import Jobs
 
 class GameManager {
-    var update: GameUpdate = GameUpdate()
     let id: String
     var roomSession: RoomSession
     
@@ -35,11 +34,11 @@ class GameManager {
         
         currentReadyCount += user.isReady ? 1 : -1
         
-//        if currentReadyCount == roomSession.room?.users?.count {
-//            countdown()
-//        } else {
-//            countDownJob.stop()
-//        }
+        if currentReadyCount == roomSession.room?.users?.count {
+            countdown()
+        } else {
+            countDownJob.stop()
+        }
         
         return user.save(on: req).flatMap { _ in
             return try self.sendRoomSession(req)
@@ -52,7 +51,7 @@ class GameManager {
         countDownJob = Jobs.add(interval: .seconds(1)) {
             count -= 1
             if count < 0 {
-                self.update.updateType = .GoToGame
+                self.roomSession.update?.updateType = .GoToGame
                 self.countDownJob.stop()
             }
             

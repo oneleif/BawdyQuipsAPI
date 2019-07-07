@@ -1,5 +1,8 @@
+
 #set("content") {
 <h3>Lobby</h3>
+
+#get(countdown)
 
 <div>
 	<div>
@@ -17,5 +20,7 @@
 	<button type="button" class="btn btn-primary" onClick="ready()">Ready up</button>
 </div>
 }
+
+
 
 #embed("authBase")

@@ -87,7 +87,7 @@ function joinRoom() {
 	const socket = new WebSocket("ws://" + ip + ":" + port + "/join/" + roomSession.id);
 	socket.onmessage = function (event) {
 		console.log(event.data);
-		// roomSession = JSON.parse(event.data);
+        roomSession = JSON.parse(event.data);
         refreshView();
 	};
 

@@ -103,6 +103,8 @@ class WebSocketController: RouteCollection {
                     view = "Children/voting"
                 case .GoToScoring:
                     view = "Children/scoreboard"
+                default:
+                    view = ""
                 }
                 
             }
@@ -138,6 +140,8 @@ class WebSocketController: RouteCollection {
                     view = "Children/voting"
                 case .GoToScoring:
                     view = "Children/scoreboard"
+                default:
+                    view = ""
                 }
                 
             }
@@ -148,10 +152,6 @@ class WebSocketController: RouteCollection {
     
     
     func getLobby(req: Request, id: String, room: Room) throws -> Future<View> {
-        guard let users = room.users else {
-            return try req.view().render("Children/lobby")
-        }
-        
         // Query 1st
         return User.query(on: req)
             .filter(\User.roomID == id)
@@ -161,7 +161,7 @@ class WebSocketController: RouteCollection {
                     return UserLobbyState(user: user.username, readyState: user.isReady)
                 }
                 return try req.view().render("Children/lobby",
-                                             LobbyContext(sessionID: id, states: states))
+                                             LobbyContext(sessionID: id, states: states, countDown: nil))
         }
     }
 }
@@ -173,6 +173,7 @@ struct XYZContext: Encodable {
 struct LobbyContext: Encodable{
     let sessionID: String
     let states: [UserLobbyState]
+    let countDown: Int?
 }
 
 struct UserLobbyState: Encodable{
