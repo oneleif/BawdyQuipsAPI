@@ -1,12 +1,15 @@
+
 #set("content") {
 <h3>Lobby</h3>
+
+#get(countdown)
 
 <div>
 	<div>
         <p>Room code: #(sessionID)</p>
 	</div>
     #for(state in states){
-        <div styles="height:60px;">
+        <div styles="height:60px;" class="lobbyReady">
             <p>#(state.user)</p>
 			<p>#(state.readyState)</p>
         </div>
@@ -14,8 +17,10 @@
 </div>
 
 <div>
-	<button type="button" onClick="ready()">Ready up</button>
+	<button type="button" class="btn btn-primary" onClick="ready()">Ready up</button>
 </div>
 }
+
+
 
 #embed("authBase")

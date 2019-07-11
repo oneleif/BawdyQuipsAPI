@@ -20,3 +20,10 @@
 	margin-right: 30px;
 }
 
+.lobbyReady {
+    flex-flow: row;
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+}
+
